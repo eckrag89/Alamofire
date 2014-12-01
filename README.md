@@ -190,7 +190,7 @@ enum ParameterEncoding {
 #### Manual Parameter Encoding of an NSURLRequest
 
 ```swift
-let URL = NSURL(string: "http://httpbin.org/get")
+let URL = NSURL(string: "http://httpbin.org/get")!
 var request = NSURLRequest(URL: URL)
 
 let parameters = ["foo": "bar"]
@@ -375,7 +375,7 @@ debugPrintln(request)
 
 #### Output (cURL)
 
-```
+```bash
 $ curl -i \
 	-H "User-Agent: Alamofire" \
 	-H "Accept-Encoding: Accept-Encoding: gzip;q=1.0,compress;q=0.5" \
@@ -498,7 +498,7 @@ Generics can be used to provide automatic, type-safe response object serializati
 
 ```swift
 @objc public protocol ResponseObjectSerializable {
-    init(response: NSHTTPURLResponse, representation: AnyObject)
+    init?(response: NSHTTPURLResponse, representation: AnyObject)
 }
 
 extension Alamofire.Request {
@@ -514,7 +514,7 @@ extension Alamofire.Request {
         }
 
         return response(serializer: serializer, completionHandler: { (request, response, object, error) in
-            completionHandler(request, response, object as? T, error)
+            completionHandler(request, response, object, error)
         })
     }
 }
@@ -525,7 +525,7 @@ final class User: ResponseObjectSerializable {
     let username: String
     let name: String
 
-    required init(response: NSHTTPURLResponse, representation: AnyObject) {
+    required init?(response: NSHTTPURLResponse, representation: AnyObject) {
         self.username = response.URL!.lastPathComponent
         self.name = representation.valueForKeyPath("name") as String
     }
@@ -632,7 +632,7 @@ enum Router: URLRequestConvertible {
             }
         }()
 
-        let URL = NSURL(string: Router.baseURLString)
+        let URL = NSURL(string: Router.baseURLString)!
         let URLRequest = NSURLRequest(URL: URL.URLByAppendingPathComponent(path))
         let encoding = Alamofire.ParameterEncoding.URL
 
@@ -686,8 +686,8 @@ enum Router: URLRequestConvertible {
     // MARK: URLRequestConvertible
 
     var URLRequest: NSURLRequest {
-        let URL = NSURL(string: Router.baseURLString)
-        let mutableURLRequest = NSMutableURLRequest(URL: URL!.URLByAppendingPathComponent(path))
+        let URL = NSURL(string: Router.baseURLString)!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(path))
         mutableURLRequest.HTTPMethod = method.rawValue
 
         if let token = Router.OAuthToken {
